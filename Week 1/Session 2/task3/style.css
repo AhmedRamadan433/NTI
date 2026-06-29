@@ -1,0 +1,117 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #f8fafc;
+  background: #0f172a;
+}
+
+.app {
+  width: min(1000px, 92%);
+  margin: auto;
+  padding: 40px 0;
+}
+
+.search-panel {
+  padding: 28px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.4rem;
+}
+
+.intro,
+.status-message {
+  color: #cbd5e1;
+}
+
+.search-form {
+  margin-top: 24px;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+input,
+button {
+  min-height: 48px;
+  border-radius: 6px;
+  font: inherit;
+}
+
+input {
+  flex: 1;
+  padding: 0 14px;
+  color: #f8fafc;
+  background: #0f172a;
+  border: 1px solid #475569;
+}
+
+button {
+  padding: 0 22px;
+  color: #0f172a;
+  background: #38bdf8;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #7dd3fc;
+}
+
+.results-section {
+  margin-top: 24px;
+}
+
+.meals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.meal-card {
+  overflow: hidden;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.meal-card img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.meal-card h2 {
+  margin: 0;
+  padding: 14px;
+  font-size: 1rem;
+}
+
+.error {
+  color: #fca5a5;
+}
+
+@media (max-width: 600px) {
+  .input-row {
+    flex-direction: column;
+  }
+}

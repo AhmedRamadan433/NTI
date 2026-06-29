@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meal Ingredient Search</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="search-panel" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">TheMealDB Finder</p>
+          <h1 id="page-title">Search meals by ingredient</h1>
+          <p class="intro">
+            Type an ingredient you have, then find meal ideas that use it.
+          </p>
+        </div>
+
+        <form id="searchForm" class="search-form">
+          <label for="ingredientInput">Ingredient</label>
+          <div class="input-row">
+            <input
+              id="ingredientInput"
+              type="search"
+              placeholder="e.g. chicken, garlic, rice"
+              autocomplete="off"
+              required
+            />
+            <button type="submit">Search</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-section" aria-live="polite">
+        <div id="statusMessage" class="status-message">
+          Start by searching for an ingredient.
+        </div>
+        <div id="mealsGrid" class="meals-grid"></div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
