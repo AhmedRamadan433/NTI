@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Node.js Fundamentals",
+    "instructor": "Esraa Said",
+    "category": "Backend",
+    "price": 199,
+    "duration": "10 hours",
+    "level": "Beginner",
+    "rating": 4.8,
+    "students": 1200,
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800"
+  },
+  {
+    "id": 2,
+    "title": "Express.js Crash Course",
+    "instructor": "Ahmed Hassan",
+    "category": "Backend",
+    "price": 149,
+    "duration": "8 hours",
+    "level": "Intermediate",
+    "rating": 4.7,
+    "students": 850,
+    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800"
+  },
+  {
+    "id": 3,
+    "title": "MongoDB & Mongoose",
+    "instructor": "Sara Mohamed",
+    "category": "Database",
+    "price": 179,
+    "duration": "7 hours",
+    "level": "Intermediate",
+    "rating": 4.9,
+    "students": 640,
+    "image": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800"
+  },
+  {
+    "id": 4,
+    "title": "Angular Complete Guide",
+    "instructor": "Mohamed Omar",
+    "category": "Frontend",
+    "price": 249,
+    "duration": "15 hours",
+    "level": "Advanced",
+    "rating": 4.9,
+    "students": 2100,
+    "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800"
+  },
+  {
+    "id": 5,
+    "title": "JavaScript Essentials",
+    "instructor": "Nour Ahmed",
+    "category": "Programming",
+    "price": 99,
+    "duration": "6 hours",
+    "level": "Beginner",
+    "rating": 4.6,
+    "students": 3100,
+    "image": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800"
+  }
+]
