@@ -31,17 +31,24 @@ const projectSchema = new mongoose.Schema(
     //     ref: "Task",
     //   },
     // ],
-    // teamMembers: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //   },
-    // ],
-    // projectOwner: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    //   required: [true, "Project owner is required"],
-    // },
+    teamMembers: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        role: {
+          type: String,
+          enum: ["Owner", "Admin", "Member"],
+          default: "Member",
+        },
+      },
+    ],
+    projectOwner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Project owner is required"],
+    },
     // projectComments: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,
@@ -53,10 +60,10 @@ const projectSchema = new mongoose.Schema(
       enum: ["Low", "Medium", "High"],
       required: [true, "Project priority is required"],
     },
-    // createdBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    // },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     isArchived: {
       type: Boolean,
       default: false,

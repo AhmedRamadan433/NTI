@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
-const connectDB = require("./config/dbConnect");
+const connectDB = require("./config/dbConnect.js");
+const HttpStatusText = require("./utils/HttpStatusText.js");
 const allRoutes = require("./routes/all_routes");
 dotenv.config();
 connectDB();
