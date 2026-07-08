@@ -1,4 +1,4 @@
-const Project = require("../models/project_model.js");
+const Project = require("../models/project.model.js");
 // const User = require("../models/user_model.js");
 const asyncWrapper = require("./Async_wrapper.js");
 const AppError = require("../utils/AppError.js");
