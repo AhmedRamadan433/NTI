@@ -120,8 +120,6 @@ taskSchema.pre("findOneAndUpdate", function (next) {
   } else if (update.status && update.status !== "done") {
     update.completedAt = null;
   }
-
-  next();
 });
 
 taskSchema.index({ project: 1, status: 1 });

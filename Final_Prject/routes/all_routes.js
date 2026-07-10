@@ -1,8 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const PojectRoutes = require("./project_routes");
-const UserRoutes = require("./user.routes");
-router.use("/users", UserRoutes);
-router.use("/projects", PojectRoutes);
+const PojectRoutes = require("./Project/project.routes.js");
+const UserRoutes = require("./User/user.routes.js");
+const TeamRoutes = require("./Team/team.route.js");
+const WorkspaceRoutes = require("./WorkSpace/workspace.routes.js");
+const SprintRoutes = require("./Sprint/sprint.routes.js");
+const protect = require(".././middleware/auth.middleware.js");
+const taskRoutes = require("./Task/task.routes.js");
+const commentRoutes = require("./Comment/comment.routes.js");
+const labelRoutes = require("./Label/label.routes.js");
+const notificationRoutes = require("./Notification/notification.routes.js");
+const chatRoutes = require("./Chat/chat.routes.js");
+const messageRoutes = require("./Message/message.routes.js");
+const attachmentRoutes = require("./Attachment/attachment.routes.js");
 
+///// user routes first to log in to get token and then access other routes
+router.use("/users", UserRoutes);
+router.use(protect);
+router.use("/workspace", WorkspaceRoutes);
+router.use("/", PojectRoutes);
+router.use("/", TeamRoutes);
+router.use("/", SprintRoutes);
+router.use("/", taskRoutes);
+router.use("/comment", commentRoutes);
+router.use("/", labelRoutes);
+router.use("/", notificationRoutes);
+router.use("/", chatRoutes);
+router.use("/", messageRoutes);
+router.use("/", attachmentRoutes);
 module.exports = router;

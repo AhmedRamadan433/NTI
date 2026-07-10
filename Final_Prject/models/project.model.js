@@ -24,13 +24,14 @@ const projectSchema = new mongoose.Schema(
     projectStatus: {
       type: String,
       enum: ["Not Started", "In Progress", "Completed"],
+      default: "Not Started",
     },
-    // projectTasks: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Task",
-    //   },
-    // ],
+    projectTasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
     teamMembers: [
       {
         user: {
@@ -49,6 +50,11 @@ const projectSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Project owner is required"],
     },
+    workspace: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+      required: [true, "Workspace is required"],
+    },
     // projectComments: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,
@@ -58,7 +64,7 @@ const projectSchema = new mongoose.Schema(
     projectPriority: {
       type: String,
       enum: ["Low", "Medium", "High"],
-      required: [true, "Project priority is required"],
+      default: "Medium",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -79,6 +85,8 @@ const projectSchema = new mongoose.Schema(
     versionKey: false,
   },
 );
+projectSchema.index({ projectName: 1, projectOwner: 1 }, { unique: true });
+projectSchema.index({ projectName: 1, teamMembers: 1 }, { unique: true });
 
 const Project = mongoose.model("Project", projectSchema);
 
