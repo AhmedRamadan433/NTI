@@ -3,7 +3,7 @@ const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
 const WorkspaceInvitation = require("../../models/WorkspaceInvitation.js");
-const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const ActivityService = require("../../services/activity.service");
 const ActivityActions = require("../../utils/activityActions");
 //// 1 get members of workspace
@@ -183,10 +183,7 @@ const inviteMember = asyncWrapper(async (req, res, next) => {
     );
   }
   ///// if not a member then create invitation
-  const token = await bcrypt.hash(
-    `${recipientId}-${workspaceId}-${Date.now()}`,
-    10,
-  );
+  const token = crypto.randomBytes(16).toString("hex");
   const invitation = new WorkspaceInvitation({
     workspace: workspaceId,
     sender: req.user._id,
