@@ -1,8 +1,85 @@
 const Attachment = require("../../models/attachment.model.js");
 const User = require("../../models/user.model.js");
+const Project = require("../../models/project.model.js");
+const Task = require("../../models/task.model.js");
+const Comment = require("../../models/comment.model.js");
+const Message = require("../../models/message.model.js");
+const Chat = require("../../models/chat.model.js");
 const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
+const ActivityService = require("../../services/activity.service");
+const ActivityActions = require("../../utils/activityActions");
+
+const getAttachmentActivityScope = async (attachment) => {
+  if (attachment.workspace) {
+    return {
+      workspace: attachment.workspace,
+      project: attachment.project || null,
+      task: attachment.task || null,
+    };
+  }
+
+  if (attachment.project) {
+    const project = await Project.findById(attachment.project).select(
+      "workspace",
+    );
+    return { workspace: project?.workspace, project: attachment.project };
+  }
+
+  if (attachment.task) {
+    const task = await Task.findById(attachment.task).select("project");
+    const project = task
+      ? await Project.findById(task.project).select("workspace")
+      : null;
+    return {
+      workspace: project?.workspace,
+      project: task?.project,
+      task: attachment.task,
+    };
+  }
+
+  if (attachment.comment) {
+    const comment = await Comment.findById(attachment.comment).select("task");
+    const task = comment
+      ? await Task.findById(comment.task).select("project")
+      : null;
+    const project = task
+      ? await Project.findById(task.project).select("workspace")
+      : null;
+    return {
+      workspace: project?.workspace,
+      project: task?.project,
+      task: task?._id,
+    };
+  }
+
+  if (attachment.message) {
+    const message = await Message.findById(attachment.message).select(
+      "workspace project",
+    );
+    if (message?.workspace) {
+      return { workspace: message.workspace, project: message.project || null };
+    }
+    if (message?.project) {
+      const project = await Project.findById(message.project).select("workspace");
+      return { workspace: project?.workspace, project: message.project };
+    }
+  }
+
+  if (attachment.chat) {
+    const chat = await Chat.findById(attachment.chat).select(
+      "workspace project team",
+    );
+    return {
+      workspace: chat?.workspace,
+      project: chat?.project || null,
+      team: chat?.team || null,
+    };
+  }
+
+  return {};
+};
 
 const createAttachment = asyncWrapper(async (req, res, next) => {
   const data = req.body;
@@ -38,6 +115,15 @@ const createAttachment = asyncWrapper(async (req, res, next) => {
     mimeType: req.file?.mimetype || data.mimeType || "",
     size: req.file?.size || data.size || 0,
     uploadedBy,
+  });
+
+  const scope = await getAttachmentActivityScope(attachment);
+  await ActivityService.log({
+    action: ActivityActions.ATTACHMENT_UPLOADED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "attachment",
+    entityId: attachment._id,
   });
 
   const populatedAttachment = await Attachment.findById(
@@ -122,6 +208,15 @@ const deleteAttachmentById = asyncWrapper(async (req, res, next) => {
   if (!attachment) {
     return next(new AppError("Attachment not found", 404, HttpStatus.FAIL));
   }
+
+  const scope = await getAttachmentActivityScope(attachment);
+  await ActivityService.log({
+    action: ActivityActions.ATTACHMENT_DELETED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "attachment",
+    entityId: attachment._id,
+  });
 
   res.status(200).json({
     status: HttpStatus.SUCCESS,

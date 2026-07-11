@@ -4,6 +4,35 @@ const Sprint = require("../../models/sprint.model.js");
 const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
+const ActivityService = require("../../services/activity.service");
+const ActivityActions = require("../../utils/activityActions");
+
+const getTaskActivityScope = async (task) => {
+  const projectId = task.project._id || task.project;
+  const sprintId = task.sprint?._id || task.sprint || null;
+  const project = await Project.findById(projectId).select("workspace");
+
+  return {
+    workspace: project?.workspace,
+    project: projectId,
+    sprint: sprintId,
+    task: task._id,
+  };
+};
+
+const getChangedFields = (previous, updated, data) => {
+  const before = {};
+  const after = {};
+
+  Object.keys(data).forEach((key) => {
+    if (JSON.stringify(previous[key]) !== JSON.stringify(updated[key])) {
+      before[key] = previous[key];
+      after[key] = updated[key];
+    }
+  });
+
+  return { before, after };
+};
 
 //// create task
 const createTask = asyncWrapper(async (req, res, next) => {
@@ -14,7 +43,7 @@ const createTask = asyncWrapper(async (req, res, next) => {
     return next(new AppError("Project id is required", 400, HttpStatus.FAIL));
   }
 
-  const project = await Project.exists({ _id: projectId });
+  const project = await Project.findById(projectId).select("workspace");
   if (!project) {
     return next(new AppError("Project not found", 404, HttpStatus.FAIL));
   }
@@ -45,6 +74,17 @@ const createTask = asyncWrapper(async (req, res, next) => {
     return next(new AppError("Task creation failed", 400, HttpStatus.FAIL));
   }
 
+  await ActivityService.log({
+    action: ActivityActions.TASK_CREATED,
+    actor: req.user.id,
+    workspace: project.workspace,
+    project: task.project,
+    sprint: task.sprint || null,
+    task: task._id,
+    entityType: "task",
+    entityId: task._id,
+  });
+
   const populatedTask = await Task.findById(task._id)
     .populate("createdBy", "firstName lastName username email")
     .populate("assignedTo", "firstName lastName username email")
@@ -57,24 +97,56 @@ const createTask = asyncWrapper(async (req, res, next) => {
 //// get all tasks (optionally by project)
 const getAllTasks = asyncWrapper(async (req, res, next) => {
   const { projectId } = req.params;
-  const query = {};
+  const { status, priority, assignee, label, sprint, sort, page, limit } =
+    req.query;
 
-  if (projectId) {
-    const project = await Project.exists({ _id: projectId });
-    if (!project) {
-      return next(new AppError("Project not found", 404, HttpStatus.FAIL));
-    }
-    query.project = projectId;
+  if (!projectId) {
+    return next(new AppError("Project id is required", 400, HttpStatus.FAIL));
   }
 
-  const tasks = await Task.find(query)
-    .populate("createdBy", "firstName lastName username email")
-    .populate("assignedTo", "firstName lastName username email")
-    .populate("labels", "name color")
-    .populate("sprint", "name status")
-    .populate("project", "projectName projectStatus");
+  const project = await Project.findById(projectId);
 
-  res.status(200).json({ status: HttpStatus.SUCCESS, data: tasks });
+  if (!project) {
+    return next(new AppError("Project not found", 404, HttpStatus.FAIL));
+  }
+
+  const filter = {
+    project: projectId,
+    isArchived: false,
+  };
+
+  if (status) filter.status = status;
+  if (priority) filter.priority = priority;
+  if (assignee) filter.assignedTo = assignee;
+  if (label) filter.labels = label;
+  if (sprint) filter.sprint = sprint;
+
+  const currentPage = Number(page) || 1;
+  const pageLimit = Number(limit) || 10;
+
+  const totalTasks = await Task.countDocuments(filter);
+
+  const tasks = await Task.find(filter)
+    .sort(sort || "-createdAt")
+    .skip((currentPage - 1) * pageLimit)
+    .limit(pageLimit)
+    .populate("createdBy", "username email")
+    .populate("assignedTo", "username email")
+    .populate("labels", "name color")
+    .populate("sprint", "name")
+    .populate("project", "projectName");
+
+  res.status(200).json({
+    status: HttpStatus.SUCCESS,
+    results: tasks.length,
+    pagination: {
+      currentPage,
+      totalPages: Math.ceil(totalTasks / pageLimit),
+      totalTasks,
+      limit: pageLimit,
+    },
+    data: tasks,
+  });
 });
 
 //// get task by id
@@ -142,6 +214,17 @@ const updateTaskById = asyncWrapper(async (req, res, next) => {
     .populate("project", "projectName projectStatus")
     .populate("parentTask", "title status priority");
 
+  const { before, after } = getChangedFields(existingTask, task, data);
+  const scope = await getTaskActivityScope(task);
+  await ActivityService.log({
+    action: ActivityActions.TASK_UPDATED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "task",
+    entityId: task._id,
+    ...(Object.keys(before).length && { before, after }),
+  });
+
   res.status(200).json({ status: HttpStatus.SUCCESS, data: task });
 });
 
@@ -153,6 +236,15 @@ const deleteTaskById = asyncWrapper(async (req, res, next) => {
   if (!task) {
     return next(new AppError("Task not found", 404, HttpStatus.FAIL));
   }
+
+  const scope = await getTaskActivityScope(task);
+  await ActivityService.log({
+    action: ActivityActions.TASK_DELETED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "task",
+    entityId: task._id,
+  });
 
   res.status(200).json({
     status: HttpStatus.SUCCESS,

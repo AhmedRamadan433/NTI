@@ -2,6 +2,22 @@ const Workspace = require("../../models/workspace.model");
 const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
+const ActivityService = require("../../services/activity.service");
+const ActivityActions = require("../../utils/activityActions");
+
+const getChangedFields = (document, data) => {
+  const before = {};
+  const after = {};
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (JSON.stringify(document[key]) !== JSON.stringify(value)) {
+      before[key] = document[key];
+      after[key] = value;
+    }
+  });
+
+  return { before, after };
+};
 
 ///1-create workspace
 const createWorkspace = asyncWrapper(async (req, res) => {
@@ -13,11 +29,20 @@ const createWorkspace = asyncWrapper(async (req, res) => {
 
   workspace.members.push({ user: workspace.owner, role: "owner" });
   await workspace.save();
+  await ActivityService.log({
+    action: ActivityActions.WORKSPACE_CREATED,
+    actor: req.user.id,
+    workspace: workspace._id,
+    entityType: "workspace",
+    entityId: workspace._id,
+  });
   res.status(201).send({ status: HttpStatus.SUCCESS, data: workspace });
 });
 /////// get all workspaces
 const getAllWorkspaces = asyncWrapper(async (req, res) => {
-  const workspaces = await Workspace.find();
+  const workspaces = await Workspace.find()
+    .populate("owner", "username email")
+    .populate("members.user", "username email");
   res.status(200).send({ status: HttpStatus.SUCCESS, data: workspaces });
 });
 ///////// get workspace by id
@@ -38,8 +63,18 @@ const updateWorkspace = asyncWrapper(async (req, res) => {
     throw new AppError("Workspace not found", 404, HttpStatus.FAIL);
   }
 
+  const { before, after } = getChangedFields(workspace, data);
   Object.assign(workspace, data);
   await workspace.save();
+
+  await ActivityService.log({
+    action: ActivityActions.WORKSPACE_UPDATED,
+    actor: req.user.id,
+    workspace: workspace._id,
+    entityType: "workspace",
+    entityId: workspace._id,
+    ...(Object.keys(before).length && { before, after }),
+  });
 
   res.status(200).send({ status: HttpStatus.SUCCESS, data: workspace });
 });
@@ -52,13 +87,11 @@ const deleteWorkspace = asyncWrapper(async (req, res) => {
   }
   await workspace.deleteOne();
 
-  res
-    .status(200)
-    .send({
-      status: HttpStatus.SUCCESS,
-      data: null,
-      message: "Workspace deleted successfully",
-    });
+  res.status(200).send({
+    status: HttpStatus.SUCCESS,
+    data: null,
+    message: "Workspace deleted successfully",
+  });
 });
 module.exports = {
   createWorkspace,

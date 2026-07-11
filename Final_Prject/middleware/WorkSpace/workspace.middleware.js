@@ -3,7 +3,7 @@ const AppError = require("../../utils/AppError.js");
 const isOwner = async (req, res, next) => {
   const owner = await Workspace.exists({
     _id: req.params.workspaceId,
-    owner: req.user.id,
+    owner: req.user._id,
   });
   if (!owner) {
     return next(new AppError("Forbidden", 403));

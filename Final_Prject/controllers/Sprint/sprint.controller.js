@@ -2,6 +2,19 @@ const Sprint = require("../../models/sprint.model.js");
 const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
+const Project = require("../../models/project.model.js");
+const ActivityService = require("../../services/activity.service");
+const ActivityActions = require("../../utils/activityActions");
+
+const getSprintActivityScope = async (sprint) => {
+  const project = await Project.findById(sprint.project).select("workspace");
+
+  return {
+    workspace: project?.workspace,
+    project: sprint.project,
+    sprint: sprint._id,
+  };
+};
 
 /// create sprint
 const createSprint = asyncWrapper(async (req, res, next) => {
@@ -14,6 +27,14 @@ const createSprint = asyncWrapper(async (req, res, next) => {
   if (!sprint) {
     return next(new AppError("Sprint creation failed", 400, HttpStatus.FAIL));
   }
+  const scope = await getSprintActivityScope(sprint);
+  await ActivityService.log({
+    action: ActivityActions.SPRINT_CREATED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "sprint",
+    entityId: sprint._id,
+  });
   res.status(201).json({ status: HttpStatus.SUCCESS, data: sprint });
 });
 

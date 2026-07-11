@@ -2,10 +2,18 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const connectDB = require("./config/dbConnect.js");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 const HttpStatusText = require("./utils/HttpStatusText.js");
 const allRoutes = require("./routes/all_routes");
 dotenv.config();
 connectDB();
+app.use(morgan("dev"));
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 app.use(express.json());
 app.use("/", allRoutes);
 

@@ -3,9 +3,9 @@ const { Schema } = mongoose;
 
 const taskSchema = new Schema(
   {
-    title: {
+    name: {
       type: String,
-      required: [true, "Task title is required"],
+      required: [true, "Task name is required"],
       trim: true,
     },
 
@@ -45,8 +45,8 @@ const taskSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["to do", "in progress", "done"],
-      default: "to do",
+      enum: ["To_Do", "In_Progress", "Done"],
+      default: "To_Do",
     },
 
     project: {
@@ -61,12 +61,12 @@ const taskSchema = new Schema(
       default: null,
     },
 
-    // attachments: [
-    //   {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Attachment",
-    //   },
-    // ],
+    attachments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Attachment",
+      },
+    ],
 
     assignedTo: [
       {
@@ -103,9 +103,9 @@ const taskSchema = new Schema(
 
 taskSchema.pre("save", function (next) {
   if (this.isModified("status")) {
-    if (this.status === "done" && !this.completedAt) {
+    if (this.status === "Done" && !this.completedAt) {
       this.completedAt = new Date();
-    } else if (this.status !== "done") {
+    } else if (this.status !== "Done") {
       this.completedAt = null;
     }
   }
@@ -115,9 +115,9 @@ taskSchema.pre("save", function (next) {
 taskSchema.pre("findOneAndUpdate", function (next) {
   const update = this.getUpdate();
 
-  if (update.status === "done") {
+  if (update.status === "Done") {
     update.completedAt = new Date();
-  } else if (update.status && update.status !== "done") {
+  } else if (update.status && update.status !== "Done") {
     update.completedAt = null;
   }
 });

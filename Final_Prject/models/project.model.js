@@ -55,12 +55,12 @@ const projectSchema = new mongoose.Schema(
       ref: "Workspace",
       required: [true, "Workspace is required"],
     },
-    // projectComments: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Comment",
-    //   },
-    // ],
+    projectComments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
     projectPriority: {
       type: String,
       enum: ["Low", "Medium", "High"],

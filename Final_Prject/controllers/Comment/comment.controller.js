@@ -1,8 +1,38 @@
 const Comment = require("../../models/comment.model.js");
 const Task = require("../../models/task.model.js");
+const Project = require("../../models/project.model.js");
 const asyncWrapper = require("../Async_wrapper.js");
 const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
+const ActivityService = require("../../services/activity.service");
+const ActivityActions = require("../../utils/activityActions");
+
+const getCommentActivityScope = async (comment) => {
+  const task = await Task.findById(comment.task).select("project");
+  const project = task
+    ? await Project.findById(task.project).select("workspace")
+    : null;
+
+  return {
+    workspace: project?.workspace,
+    project: task?.project,
+    task: task?._id,
+  };
+};
+
+const getChangedFields = (previous, updated, data) => {
+  const before = {};
+  const after = {};
+
+  Object.keys(data).forEach((key) => {
+    if (JSON.stringify(previous[key]) !== JSON.stringify(updated[key])) {
+      before[key] = previous[key];
+      after[key] = updated[key];
+    }
+  });
+
+  return { before, after };
+};
 
 //// create comment
 const createComment = asyncWrapper(async (req, res, next) => {
@@ -22,6 +52,15 @@ const createComment = asyncWrapper(async (req, res, next) => {
     ...data,
     task: taskId,
     author: req.user?._id || req.user?.id,
+  });
+
+  const scope = await getCommentActivityScope(comment);
+  await ActivityService.log({
+    action: ActivityActions.COMMENT_CREATED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "comment",
+    entityId: comment._id,
   });
 
   const populatedComment = await Comment.findById(comment._id)
@@ -106,6 +145,17 @@ const updateCommentById = asyncWrapper(async (req, res, next) => {
     .populate("author", "firstName lastName username email")
     .populate("task", "title status priority");
 
+  const { before, after } = getChangedFields(existingComment, comment, data);
+  const scope = await getCommentActivityScope(existingComment);
+  await ActivityService.log({
+    action: ActivityActions.COMMENT_UPDATED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "comment",
+    entityId: comment._id,
+    ...(Object.keys(before).length && { before, after }),
+  });
+
   res.status(200).json({ status: HttpStatus.SUCCESS, data: comment });
 });
 
@@ -138,6 +188,15 @@ const deleteCommentById = asyncWrapper(async (req, res, next) => {
       runValidators: true,
     },
   );
+
+  const scope = await getCommentActivityScope(existingComment);
+  await ActivityService.log({
+    action: ActivityActions.COMMENT_DELETED,
+    actor: req.user.id,
+    ...scope,
+    entityType: "comment",
+    entityId: existingComment._id,
+  });
 
   res.status(200).json({
     status: HttpStatus.SUCCESS,

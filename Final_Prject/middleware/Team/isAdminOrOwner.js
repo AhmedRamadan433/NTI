@@ -4,11 +4,11 @@ const AppError = require("../../utils/AppError.js");
 
 const isAdminOrOwner = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const teamId = req.params.teamId || req.params.id;
     const userId = req.user.id;
 
     // Get workspace id only
-    const team = await Team.findById(id).select("workspace");
+    const team = await Team.findById(teamId).select("workspace");
 
     if (!team) {
       return next(new AppError("Team not found", 404));
