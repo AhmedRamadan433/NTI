@@ -1,11 +1,11 @@
 export interface Sprint {
   _id: string;
   name: string;
-  project: string;
   goal: string;
+  project: string;
   startDate: string;
   endDate: string;
-  status: "planning" | "active" | "completed" | "cancelled";
+  status: "planned" | "active" | "completed";
   createdAt: string;
   updatedAt: string;
 }

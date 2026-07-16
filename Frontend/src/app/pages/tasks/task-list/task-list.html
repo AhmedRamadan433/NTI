@@ -13,9 +13,8 @@
   <a
     [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', 'create']"
     class="btn btn-primary btn-sm"
+    >+ New Task</a
   >
-    + New Task
-  </a>
 </div>
 
 @if (loading()) {
@@ -27,9 +26,8 @@
   <a
     [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', 'create']"
     class="btn btn-primary mt-2"
+    >Create Task</a
   >
-    Create Task
-  </a>
 </div>
 } @else {
 <div class="card">
@@ -49,7 +47,7 @@
         <td>
           <a
             [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', task._id]"
-            >{{ task.title }}</a
+            >{{ task.name }}</a
           >
         </td>
         <td>
@@ -62,7 +60,7 @@
             >{{ task.priority }}</span
           >
         </td>
-        <td>{{ task.dueDate || '—' }}</td>
+        <td>{{ task.endDate || '—' }}</td>
         <td>
           <div class="flex gap-1">
             <a

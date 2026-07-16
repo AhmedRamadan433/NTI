@@ -1,6 +1,8 @@
 export interface Label {
-  id: string;
+  _id: string;
   name: string;
   color: string;
-  projectId: string;
+  workspace: string;
+  createdAt: string;
+  updatedAt: string;
 }

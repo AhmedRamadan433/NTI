@@ -1,39 +1,53 @@
-@if (loading()) {
-  <div class="empty-state">Loading...</div>
-} @else {
-  @if (project(); as p) {
-    <div class="breadcrumb">
-      <a [routerLink]="['/workspaces', workspaceId]">Workspace</a>
-      <span class="breadcrumb-separator">/</span>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects']">Projects</a>
-      <span class="breadcrumb-separator">/</span>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects', p.id]">{{ p.name }}</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Delete</span>
+<div class="page-centered">
+  <div class="card delete-card">
+    <div class="delete-icon-wrapper">
+      <svg
+        class="warning-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18A2 2 0 0 0 3.55 21H20.45A2 2 0 0 0 22.18 18L13.71 3.86A2 2 0 0 0 10.29 3.86Z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
     </div>
 
-    <div class="page-header">
-      <h1 class="page-title">Delete Project</h1>
+    <h1 class="delete-title">Delete Project</h1>
+    <p class="delete-subtitle">
+      This action is permanent and cannot be undone.
+    </p>
+
+    <div class="delete-warning-box">
+      Deleting this project will permanently remove all associated tasks and
+      sprints.
     </div>
 
-    <div class="card danger-card">
-      <div class="danger-icon">!</div>
-      <h3>Are you sure?</h3>
-      <p>
-        Deleting <strong>{{ p.name }}</strong> will permanently remove all sprints and tasks
-        within this project. This action cannot be undone.
-      </p>
-      <div class="form-actions">
-        <a [routerLink]="['/workspaces', workspaceId, 'projects', p.id]" class="btn btn-secondary">Cancel</a>
-        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
-          {{ deleting() ? 'Deleting...' : 'Yes, delete it' }}
-        </button>
-      </div>
+    @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <div class="delete-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancel()"
+        [disabled]="deleting()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="deleteProject()"
+        [disabled]="deleting()"
+      >
+        {{ deleting() ? 'Deleting...' : 'Delete Project' }}
+      </button>
     </div>
-  } @else {
-    <div class="card empty-state">
-      <h3>Project not found</h3>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects']" class="btn btn-primary mt-2">Back to Projects</a>
-    </div>
-  }
-}
+  </div>
+</div>

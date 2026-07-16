@@ -37,6 +37,11 @@
       class="btn btn-secondary btn-sm"
       >Edit Project</a
     >
+    <a
+      [routerLink]="['/workspaces', workspaceId(), 'projects', p._id, 'delete']"
+      class="btn btn-error btn-sm"
+      >Delete Project</a
+    >
   </div>
 </div>
 

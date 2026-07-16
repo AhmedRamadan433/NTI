@@ -1,11 +1,14 @@
+import { SprintService } from "./services/sprint";
 import { Routes } from "@angular/router";
 import { APP_ROUTES } from "./constants/app-routes.constants";
+import { authGuard } from "./guards/auth-guard";
 
 export const routes: Routes = [
   {
     path: "",
     loadComponent: () =>
       import("./layouts/main-layout/main-layout").then((m) => m.MainLayout),
+    canActivate: [authGuard],
     children: [
       { path: "", redirectTo: APP_ROUTES.WORKSPACES, pathMatch: "full" },
 
@@ -62,6 +65,13 @@ export const routes: Routes = [
                 (m) => m.EditProject,
               ),
           },
+          {
+            path: "projects/:projectId/delete",
+            loadComponent: () =>
+              import("./pages/projects/delete-project/delete-project").then(
+                (m) => m.DeleteProject,
+              ),
+          },
 
           // Sprints
           {
@@ -75,7 +85,7 @@ export const routes: Routes = [
             path: "projects/:projectId/sprints/create",
             loadComponent: () =>
               import("./pages/sprints/sprint-create/sprint-create").then(
-                (m) => m.SprintCreate,
+                (m) => m.CreateSprint,
               ),
           },
           {
@@ -89,7 +99,14 @@ export const routes: Routes = [
             path: "projects/:projectId/sprints/:sprintId/edit",
             loadComponent: () =>
               import("./pages/sprints/sprint-edit/sprint-edit").then(
-                (m) => m.SprintEdit,
+                (m) => m.EditSprint,
+              ),
+          },
+          {
+            path: "projects/:projectId/sprints/:sprintId/delete",
+            loadComponent: () =>
+              import("./pages/sprints/sprint-delete/sprint-delete").then(
+                (m) => m.DeleteSprint,
               ),
           },
 

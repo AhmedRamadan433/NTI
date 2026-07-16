@@ -5,8 +5,10 @@ import {
   inject,
   signal,
   input,
+  effect,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
 import { SprintService } from "../../../services/sprint";
 import { Sprint } from "../../../models/sprint.model";
 import { ApiResponse } from "../../../models/api-response.model";
@@ -14,7 +16,7 @@ import { ApiResponse } from "../../../models/api-response.model";
 @Component({
   selector: "app-sprint-list",
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./sprint-list.html",
   styleUrl: "./sprint-list.css",
@@ -30,14 +32,19 @@ export class SprintList {
   protected loading = signal(true);
 
   constructor() {
-    this.loadSprints();
+    effect(() => {
+      const id = this.projectId();
+      if (id) {
+        this.loadSprints(id);
+      } else {
+        this.loading.set(false);
+      }
+    });
   }
 
-  private loadSprints(): void {
-    const projId = this.projectId();
-    if (!projId) return;
-
-    this.sprintService.list(projId).subscribe({
+  private loadSprints(projectId: string): void {
+    this.loading.set(true);
+    this.sprintService.list(projectId).subscribe({
       next: (res: ApiResponse<Sprint[]>) => {
         this.sprints.set(res.data ?? []);
         this.loading.set(false);

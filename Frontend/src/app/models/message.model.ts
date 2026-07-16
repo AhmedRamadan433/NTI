@@ -1,8 +1,15 @@
 export interface Message {
-  id: string;
-  chatId: string;
-  senderId: string;
+  _id: string;
+  chat: string;
+  sender: string;
   content: string;
-  read: boolean;
+  workspace?: string;
+  project?: string;
+  team?: string;
+  receiver?: string;
+  attachments: string[];
+  isEdited: boolean;
+  isDeleted: boolean;
   createdAt: string;
+  updatedAt: string;
 }

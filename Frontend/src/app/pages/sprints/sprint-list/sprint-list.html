@@ -1,13 +1,3 @@
-<div class="breadcrumb">
-  <a [routerLink]="['/workspaces', workspaceId()]">Workspace</a>
-  <span class="breadcrumb-separator">/</span>
-  <a [routerLink]="['/workspaces', workspaceId(), 'projects', projectId()]"
-    >Project</a
-  >
-  <span class="breadcrumb-separator">/</span>
-  <span>Sprints</span>
-</div>
-
 <div class="page-header">
   <h2>Sprints</h2>
   <a
@@ -23,7 +13,7 @@
 } @else if (sprints().length === 0) {
 <div class="card empty-state">
   <h3>No sprints yet</h3>
-  <p>Create a sprint to start planning your work.</p>
+  <p>Create a sprint to start planning time-boxed work.</p>
   <a
     [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', 'create']"
     class="btn btn-primary mt-2"
@@ -32,36 +22,37 @@
   </a>
 </div>
 } @else {
-<div class="list-group">
+<div class="grid grid-3">
   @for (sprint of sprints(); track sprint._id) {
-  <div class="list-item sprint-item">
-    <div class="sprint-info">
-      <h3>
-        <a
-          [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', sprint._id]"
-          >{{ sprint.name }}</a
-        >
-      </h3>
-      <p class="text-secondary text-sm">{{ sprint.goal || 'No goal set' }}</p>
-      <div class="sprint-dates">
-        <span class="badge badge-neutral">{{ sprint.startDate }}</span>
-        <span class="breadcrumb-separator">→</span>
-        <span class="badge badge-neutral">{{ sprint.endDate }}</span>
-      </div>
-    </div>
-    <div class="sprint-actions">
+  <div class="card card-hover project-card">
+    <div class="project-header">
       <span
         class="badge"
+        [class.badge-neutral]="sprint.status === 'planned'"
         [class.badge-success]="sprint.status === 'active'"
-        [class.badge-warning]="sprint.status === 'planning'"
         [class.badge-info]="sprint.status === 'completed'"
       >
         {{ sprint.status }}
       </span>
+    </div>
+    <h3>
+      <a
+        [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', sprint._id]"
+        >{{ sprint.name }}</a
+      >
+    </h3>
+    <p class="text-secondary text-sm project-desc">
+      {{ sprint.goal || 'No goal set' }}
+    </p>
+    <p class="text-secondary text-sm">
+      {{ sprint.startDate | date: 'mediumDate' }} - {{ sprint.endDate | date:
+      'mediumDate' }}
+    </p>
+    <div class="project-footer">
       <a
         [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', sprint._id]"
         class="btn btn-secondary btn-sm"
-        >View</a
+        >View Details</a
       >
       <a
         [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', sprint._id, 'edit']"

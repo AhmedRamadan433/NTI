@@ -1,9 +1,11 @@
 export interface Comment {
-  id: string;
+  _id: string;
   content: string;
-  taskId: string;
-  authorId: string;
-  parentId?: string;
+  task: string;
+  author: string;
+  attachments: string[];
+  isEdited: boolean;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
 }

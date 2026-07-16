@@ -1,10 +1,11 @@
 export interface WorkspaceInvitation {
-  id: string;
-  workspaceId: string;
-  email: string;
-  role: string;
-  status: 'pending' | 'accepted' | 'declined';
-  invitedById: string;
+  _id: string;
+  workspace: string;
+  sender: string;
+  recipient: string;
+  token: string;
+  status: "pending" | "accepted" | "declined" | "expired";
   expiresAt: string;
   createdAt: string;
+  updatedAt: string;
 }

@@ -1,59 +1,76 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { SprintService } from '../../../services/sprint';
-import { Sprint } from '../../../models/sprint.model';
-import { ApiResponse } from '../../../models/api-response.model';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  signal,
+  input,
+} from "@angular/core";
+import { RouterLink, Router } from "@angular/router";
+import { SprintService } from "../../../services/sprint";
 
 @Component({
-  selector: 'app-sprint-delete',
+  selector: "app-delete-sprint",
   standalone: true,
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './sprint-delete.html',
-  styleUrl: './sprint-delete.css',
+  templateUrl: "./sprint-delete.html",
+  styleUrl: "./sprint-delete.css",
 })
-export class SprintDelete {
+export class DeleteSprint {
+  workspaceId = input<string>();
+  projectId = input<string>();
+  sprintId = input<string>();
+
   private sprintService = inject(SprintService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
-  protected workspaceId = '';
-  protected projectId = '';
-  protected sprintId = '';
-  protected sprint = signal<Sprint | null>(null);
-  protected loading = signal(true);
   protected deleting = signal(false);
+  protected error = signal<string | null>(null);
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      this.workspaceId = params.get('workspaceId') ?? '';
-      this.projectId = params.get('projectId') ?? '';
-      this.sprintId = params.get('sprintId') ?? '';
-      if (this.sprintId) {
-        this.loadSprint();
-      } else {
-        this.loading.set(false);
-      }
-    });
-  }
+  deleteSprint(): void {
+    if (this.deleting()) {
+      return;
+    }
 
-  private loadSprint(): void {
-    this.sprintService.getById(this.sprintId).subscribe({
-      next: (res: ApiResponse<Sprint>) => {
-        this.sprint.set(res.data ?? null);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
-  }
+    const id = this.sprintId();
+    if (!id) {
+      this.error.set("Sprint ID is missing!");
+      return;
+    }
 
-  confirmDelete(): void {
     this.deleting.set(true);
-    this.sprintService.delete(this.sprintId).subscribe({
+    this.error.set(null);
+
+    this.sprintService.delete(id).subscribe({
       next: () => {
-        this.router.navigate(['/workspaces', this.workspaceId, 'projects', this.projectId, 'sprints']);
+        this.deleting.set(false);
+        this.cdr.markForCheck();
+        this.router.navigate([
+          "/workspaces",
+          this.workspaceId(),
+          "projects",
+          this.projectId(),
+          "sprints",
+        ]);
       },
-      error: () => this.deleting.set(false),
+      error: () => {
+        this.error.set("Failed to delete sprint.");
+        this.deleting.set(false);
+        this.cdr.markForCheck();
+      },
     });
+  }
+
+  cancel(): void {
+    this.router.navigate([
+      "/workspaces",
+      this.workspaceId(),
+      "projects",
+      this.projectId(),
+      "sprints",
+      this.sprintId(),
+    ]);
   }
 }

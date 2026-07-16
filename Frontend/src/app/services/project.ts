@@ -1,50 +1,58 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { API_ROUTES } from "../constants/api.constants";
-import { Project } from "../models/project.model";
 import { ApiResponse } from "../models/api-response.model";
+import { Project } from "../models/project.model";
+import { API_ROUTES, API_BASE_URL } from "../constants/api.constants";
 
-@Injectable({ providedIn: "root" })
+export interface CreateProjectRequest {
+  projectName: string;
+  projectDescription: string;
+  projectStatus: "Not Started" | "In Progress" | "Completed";
+  projectPriority: "Low" | "Medium" | "High";
+  projectEndDate?: string;
+}
+
+export type UpdateProjectRequest = Partial<CreateProjectRequest>;
+
+@Injectable({
+  providedIn: "root",
+})
 export class ProjectService {
   private http = inject(HttpClient);
+  private projectsUrl = `${API_BASE_URL}/projects`;
 
-  // Get all projects for a specific workspace
   list(workspaceId: string): Observable<ApiResponse<Project[]>> {
     return this.http.get<ApiResponse<Project[]>>(
       `${API_ROUTES.WORKSPACE}/${workspaceId}/projects`,
     );
   }
 
-  // Get a single project by its ID
   getById(id: string): Observable<ApiResponse<Project>> {
-    return this.http.get<ApiResponse<Project>>(`${API_ROUTES.PROJECT}/${id}`);
+    return this.http.get<ApiResponse<Project>>(`${this.projectsUrl}/${id}`);
   }
 
-  // Create a new project inside a workspace
   create(
     workspaceId: string,
-    project: Partial<Project>,
+    data: CreateProjectRequest | Partial<Project>,
   ): Observable<ApiResponse<Project>> {
     return this.http.post<ApiResponse<Project>>(
       `${API_ROUTES.WORKSPACE}/${workspaceId}/projects`,
-      project,
+      data,
     );
   }
 
-  // Update an existing project using the project's ID
   update(
     id: string,
-    project: Partial<Project>,
+    data: UpdateProjectRequest | Partial<Project>,
   ): Observable<ApiResponse<Project>> {
     return this.http.patch<ApiResponse<Project>>(
-      `${API_ROUTES.PROJECT}/${id}`,
-      project,
-    ); // Changed to .patch
+      `${this.projectsUrl}/${id}`,
+      data,
+    );
   }
 
-  // Delete a project
-  delete(id: string): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${API_ROUTES.PROJECT}/${id}`);
+  delete(id: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.projectsUrl}/${id}`);
   }
 }

@@ -1,39 +1,31 @@
-@if (loading()) {
-  <div class="empty-state">Loading...</div>
-} @else {
-  @if (sprint(); as s) {
-    <div class="breadcrumb">
-      <a [routerLink]="['/workspaces', workspaceId]">Workspace</a>
-      <span class="breadcrumb-separator">/</span>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId]">Project</a>
-      <span class="breadcrumb-separator">/</span>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'sprints']">Sprints</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Delete</span>
-    </div>
+<div class="card empty-state delete-confirm">
+  <div class="warning-icon">⚠️</div>
+  <h2>Delete Sprint</h2>
+  <p class="text-secondary">
+    This action is permanent and cannot be undone. Tasks assigned to this sprint
+    will be unassigned, not deleted.
+  </p>
 
-    <div class="page-header">
-      <h1 class="page-title">Delete Sprint</h1>
-    </div>
-
-    <div class="card danger-card">
-      <div class="danger-icon">!</div>
-      <h3>Are you sure?</h3>
-      <p>
-        Deleting <strong>{{ s.name }}</strong> will permanently remove this sprint.
-        This action cannot be undone.
-      </p>
-      <div class="form-actions">
-        <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'sprints', s.id]" class="btn btn-secondary">Cancel</a>
-        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
-          {{ deleting() ? 'Deleting...' : 'Yes, delete it' }}
-        </button>
-      </div>
-    </div>
-  } @else {
-    <div class="card empty-state">
-      <h3>Sprint not found</h3>
-      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'sprints']" class="btn btn-primary mt-2">Back to Sprints</a>
-    </div>
+  @if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
   }
-}
+
+  <div class="page-actions justify-center mt-3">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="cancel()"
+      [disabled]="deleting()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="deleteSprint()"
+      [disabled]="deleting()"
+    >
+      {{ deleting() ? 'Deleting...' : 'Delete Sprint' }}
+    </button>
+  </div>
+</div>

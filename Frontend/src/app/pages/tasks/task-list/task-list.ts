@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   input,
+  effect,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TaskService } from "../../../services/task";
@@ -30,13 +31,18 @@ export class TaskListComponent {
   protected loading = signal(true);
 
   constructor() {
-    this.loadTasks();
+    effect(() => {
+      const projId = this.projectId();
+      if (projId) {
+        this.loadTasks(projId);
+      } else {
+        this.loading.set(false);
+      }
+    });
   }
 
-  private loadTasks(): void {
-    const projId = this.projectId();
-    if (!projId) return;
-
+  private loadTasks(projId: string): void {
+    this.loading.set(true);
     this.taskService.list(projId).subscribe({
       next: (res: ApiResponse<Task[]>) => {
         this.tasks.set(res.data ?? []);

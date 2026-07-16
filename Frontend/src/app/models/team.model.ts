@@ -1,8 +1,11 @@
 export interface Team {
-  id: string;
+  _id: string;
   name: string;
-  workspaceId: string;
-  memberIds: string[];
+  description: string;
+  workspace: string;
+  leader: string;
+  members: string[];
+  avatar: string;
   createdAt: string;
   updatedAt: string;
 }

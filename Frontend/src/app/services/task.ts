@@ -29,7 +29,6 @@ export class TaskService {
     );
   }
 
-  // Changed to .patch
   update(id: string, task: Partial<Task>): Observable<ApiResponse<Task>> {
     return this.http.patch<ApiResponse<Task>>(`${API_ROUTES.TASK}/${id}`, task);
   }

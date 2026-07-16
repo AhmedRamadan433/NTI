@@ -1,7 +1,8 @@
 export interface WorkspaceSettings {
-  id: string;
-  workspaceId: string;
-  allowMemberInvites: boolean;
-  defaultProjectVisibility: 'private' | 'team' | 'public';
-  retentionDays: number;
+  _id: string;
+  workspace: string;
+  visibility: "public" | "private";
+  allowInvitations: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

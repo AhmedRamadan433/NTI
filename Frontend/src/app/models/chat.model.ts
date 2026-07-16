@@ -1,8 +1,11 @@
 export interface Chat {
-  id: string;
-  workspaceId: string;
+  _id: string;
   name: string;
-  participantIds: string[];
+  type: "direct" | "team" | "project";
+  workspace: string;
+  participants: string[];
+  project?: string;
+  team?: string;
   lastMessage?: string;
   createdAt: string;
   updatedAt: string;

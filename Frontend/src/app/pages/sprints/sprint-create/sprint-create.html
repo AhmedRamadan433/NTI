@@ -1,65 +1,71 @@
-<div class="breadcrumb">
-  <a [routerLink]="['/workspaces', workspaceId]">Workspace</a>
-  <span class="breadcrumb-separator">/</span>
-  <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId]">Project</a>
-  <span class="breadcrumb-separator">/</span>
-  <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'sprints']">Sprints</a>
-  <span class="breadcrumb-separator">/</span>
-  <span>Create</span>
-</div>
-
 <div class="page-header">
-  <h1 class="page-title">Create Sprint</h1>
+  <h2>Create Sprint</h2>
 </div>
-
-@if (error()) {
-  <div class="alert alert-error">{{ error() }}</div>
-}
 
 <div class="card form-card">
-  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-2">
+  @if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="form-group">
-      <label class="form-label" for="name">Sprint name</label>
-      <input id="name" type="text" class="form-control" formControlName="name" placeholder="Sprint 1" />
-      @if (form.controls.name.touched && form.controls.name.invalid) {
-        <span class="field-error">Name is required (min 2 characters).</span>
+      <label for="name">Sprint Name</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        placeholder="e.g. Sprint 1"
+      />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+      <span class="form-error"
+        >Sprint name is required (min 2 characters).</span
+      >
       }
     </div>
 
     <div class="form-group">
-      <label class="form-label" for="goal">Goal</label>
-      <textarea id="goal" class="form-control" formControlName="goal" placeholder="What should this sprint achieve?"></textarea>
+      <label for="goal">Goal (optional)</label>
+      <textarea
+        id="goal"
+        formControlName="goal"
+        rows="3"
+        placeholder="What should this sprint accomplish?"
+      ></textarea>
     </div>
 
     <div class="grid grid-2">
       <div class="form-group">
-        <label class="form-label" for="startDate">Start date</label>
-        <input id="startDate" type="date" class="form-control" formControlName="startDate" />
-        @if (form.controls.startDate.touched && form.controls.startDate.invalid) {
-          <span class="field-error">Start date is required.</span>
+        <label for="startDate">Start Date</label>
+        <input id="startDate" type="date" formControlName="startDate" />
+        @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+        <span class="form-error">Start date is required.</span>
         }
       </div>
+
       <div class="form-group">
-        <label class="form-label" for="endDate">End date</label>
-        <input id="endDate" type="date" class="form-control" formControlName="endDate" />
-        @if (form.controls.endDate.touched && form.controls.endDate.invalid) {
-          <span class="field-error">End date is required.</span>
+        <label for="endDate">End Date</label>
+        <input id="endDate" type="date" formControlName="endDate" />
+        @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
+        <span class="form-error">End date is required.</span>
         }
       </div>
     </div>
 
     <div class="form-group">
-      <label class="form-label" for="status">Status</label>
-      <select id="status" class="form-control" formControlName="status">
-        <option value="planning">Planning</option>
+      <label for="status">Status</label>
+      <select id="status" formControlName="status">
+        <option value="planned">Planned</option>
         <option value="active">Active</option>
         <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
       </select>
     </div>
 
-    <div class="form-actions">
-      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'sprints']" class="btn btn-secondary">Cancel</a>
+    <div class="page-actions mt-3">
+      <a
+        [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints']"
+        class="btn btn-secondary"
+        >Cancel</a
+      >
       <button type="submit" class="btn btn-primary" [disabled]="loading()">
         {{ loading() ? 'Creating...' : 'Create Sprint' }}
       </button>

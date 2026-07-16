@@ -63,13 +63,28 @@ const getSprintById = asyncWrapper(async (req, res, next) => {
 const updateSprintById = asyncWrapper(async (req, res, next) => {
   const { id } = req.params;
   const data = req.body;
+
+  const existing = await Sprint.findById(id);
+  if (!existing) {
+    return next(new AppError("Sprint not found", 404, HttpStatus.FAIL));
+  }
+
+  const newStart = data.startDate
+    ? new Date(data.startDate)
+    : existing.startDate;
+  const newEnd = data.endDate ? new Date(data.endDate) : existing.endDate;
+
+  if (newEnd <= newStart) {
+    return next(
+      new AppError("End date must be after start date", 400, HttpStatus.FAIL),
+    );
+  }
+
   const sprint = await Sprint.findByIdAndUpdate(id, data, {
     runValidators: true,
     returnDocument: "after",
   });
-  if (!sprint) {
-    return next(new AppError("Sprint not found", 404, HttpStatus.FAIL));
-  }
+
   res.status(200).json({ status: HttpStatus.SUCCESS, data: sprint });
 });
 

@@ -8,6 +8,7 @@ import {
   effect,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { DatePipe } from "@angular/common";
 import { SprintService } from "../../../services/sprint";
 import { Sprint } from "../../../models/sprint.model";
 import { ApiResponse } from "../../../models/api-response.model";
@@ -15,7 +16,7 @@ import { ApiResponse } from "../../../models/api-response.model";
 @Component({
   selector: "app-sprint-details",
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./sprint-details.html",
   styleUrl: "./sprint-details.css",
@@ -43,6 +44,7 @@ export class SprintDetails {
   }
 
   private loadSprint(id: string): void {
+    this.loading.set(true);
     this.sprintService.getById(id).subscribe({
       next: (res: ApiResponse<Sprint>) => {
         this.sprint.set(res.data ?? null);

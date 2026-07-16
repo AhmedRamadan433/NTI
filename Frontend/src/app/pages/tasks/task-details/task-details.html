@@ -12,12 +12,12 @@
   <span class="breadcrumb-separator">/</span>
   <a
     [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', t._id]"
-    >{{ t.title }}</a
+    >{{ t.name }}</a
   >
 </div>
 
 <div class="page-header">
-  <h1 class="page-title">{{ t.title }}</h1>
+  <h1 class="page-title">{{ t.name }}</h1>
   <div class="page-actions">
     <a
       [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', t._id, 'edit']"
@@ -39,10 +39,10 @@
         >{{ t.priority }}</span
       >
     </div>
-    @if (t.dueDate) {
+    @if (t.endDate) {
     <div class="meta-item">
       <span class="meta-label">Due Date</span>
-      <span>{{ t.dueDate }}</span>
+      <span>{{ t.endDate }}</span>
     </div>
     }
   </div>

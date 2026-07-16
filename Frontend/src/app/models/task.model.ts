@@ -1,14 +1,20 @@
 export interface Task {
   _id: string;
-  title: string;
+  name: string;
   description: string;
-  project: string;
   sprint?: string;
-  assignee?: string;
-  status: "todo" | "in-progress" | "review" | "done";
-  priority: "low" | "medium" | "high" | "urgent";
-  dueDate?: string;
   labels: string[];
+  isArchived: boolean;
+  createdBy: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "To_Do" | "In_Progress" | "Done";
+  project: string;
+  parentTask?: string | null;
+  attachments: string[];
+  assignedTo: string[];
+  startDate: string;
+  endDate?: string;
+  completedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

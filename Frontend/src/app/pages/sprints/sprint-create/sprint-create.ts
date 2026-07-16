@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   inject,
   signal,
@@ -11,20 +12,21 @@ import { SprintService } from "../../../services/sprint";
 import { Sprint } from "../../../models/sprint.model";
 
 @Component({
-  selector: "app-sprint-create",
+  selector: "app-create-sprint",
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./sprint-create.html",
   styleUrl: "./sprint-create.css",
 })
-export class SprintCreate {
+export class CreateSprint {
+  workspaceId = input<string>();
+  projectId = input<string>();
+
   private fb = inject(FormBuilder);
   private sprintService = inject(SprintService);
   private router = inject(Router);
-
-  workspaceId = input<string>();
-  projectId = input<string>();
+  private cdr = inject(ChangeDetectorRef);
 
   protected loading = signal(false);
   protected error = signal<string | null>(null);
@@ -34,7 +36,7 @@ export class SprintCreate {
     goal: [""],
     startDate: ["", [Validators.required]],
     endDate: ["", [Validators.required]],
-    status: ["planning", [Validators.required]],
+    status: ["planned", [Validators.required]],
   });
 
   submit(): void {
@@ -43,23 +45,29 @@ export class SprintCreate {
       return;
     }
 
+    const projId = this.projectId();
+    if (!projId) {
+      this.error.set("Project ID is missing!");
+      return;
+    }
+
+    if (this.form.value.endDate! <= this.form.value.startDate!) {
+      this.error.set("End date must be after start date.");
+      return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
 
-    const projId = this.projectId();
-    if (!projId) return;
-
-    const data: any = {
-      ...this.form.getRawValue(),
-      project: projId,
-    } as Partial<Sprint>;
+    const data = this.form.getRawValue() as Partial<Sprint>;
 
     this.sprintService.create(projId, data).subscribe({
       next: (res) => {
+        const wsId = this.workspaceId();
         if (res.data?._id) {
           this.router.navigate([
             "/workspaces",
-            this.workspaceId(),
+            wsId,
             "projects",
             projId,
             "sprints",
@@ -68,7 +76,7 @@ export class SprintCreate {
         } else {
           this.router.navigate([
             "/workspaces",
-            this.workspaceId(),
+            wsId,
             "projects",
             projId,
             "sprints",
@@ -78,6 +86,7 @@ export class SprintCreate {
       error: () => {
         this.error.set("Failed to create sprint.");
         this.loading.set(false);
+        this.cdr.markForCheck();
       },
     });
   }

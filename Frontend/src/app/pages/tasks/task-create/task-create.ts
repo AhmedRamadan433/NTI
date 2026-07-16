@@ -30,13 +30,22 @@ export class TaskCreate {
   protected error = signal<string | null>(null);
 
   protected form = this.fb.nonNullable.group({
-    title: ["", [Validators.required, Validators.minLength(2)]],
+    name: ["", [Validators.required, Validators.minLength(2)]],
     description: [""],
-    status: ["todo", [Validators.required]],
+    status: ["To_Do", [Validators.required]],
     priority: ["medium", [Validators.required]],
-    dueDate: [""],
-    assignee: [""],
+    endDate: [""],
+    assignedTo: this.fb.nonNullable.control<string[]>([]),
   });
+
+  protected onAssignedToChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    const ids = value
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    this.form.controls.assignedTo.setValue(ids);
+  }
 
   submit(): void {
     if (this.form.invalid) {

@@ -1,57 +1,69 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { ProjectService } from '../../../services/project';
-import { Project } from '../../../models/project.model';
-import { ApiResponse } from '../../../models/api-response.model';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  signal,
+  input,
+} from "@angular/core";
+import { RouterLink, Router } from "@angular/router";
+import { ProjectService } from "../../../services/project";
 
 @Component({
-  selector: 'app-delete-project',
+  selector: "app-delete-project",
   standalone: true,
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './delete-project.html',
-  styleUrl: './delete-project.css',
+  templateUrl: "./delete-project.html",
+  styleUrl: "./delete-project.css",
 })
 export class DeleteProject {
+  workspaceId = input<string>();
+  projectId = input<string>();
+
   private projectService = inject(ProjectService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
-  protected workspaceId = '';
-  protected projectId = '';
-  protected project = signal<Project | null>(null);
-  protected loading = signal(true);
   protected deleting = signal(false);
+  protected error = signal<string | null>(null);
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      this.workspaceId = params.get('workspaceId') ?? '';
-      this.projectId = params.get('projectId') ?? '';
-      if (this.projectId) {
-        this.loadProject();
-      } else {
-        this.loading.set(false);
-      }
-    });
-  }
+  deleteProject(): void {
+    if (this.deleting()) {
+      return;
+    }
 
-  private loadProject(): void {
-    this.projectService.getById(this.projectId).subscribe({
-      next: (res: ApiResponse<Project>) => {
-        this.project.set(res.data ?? null);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
-  }
+    const id = this.projectId();
+    const wsId = this.workspaceId();
 
-  confirmDelete(): void {
+    if (!id || !wsId) {
+      this.error.set("Project ID is missing!");
+      return;
+    }
+
     this.deleting.set(true);
-    this.projectService.delete(this.projectId).subscribe({
+    this.error.set(null);
+
+    this.projectService.delete(id).subscribe({
       next: () => {
-        this.router.navigate(['/workspaces', this.workspaceId, 'projects']);
+        this.deleting.set(false);
+        this.cdr.markForCheck();
+        this.router.navigate(["/workspaces", wsId, "projects"]);
       },
-      error: () => this.deleting.set(false),
+      error: () => {
+        this.error.set("Failed to delete project.");
+        this.deleting.set(false);
+        this.cdr.markForCheck();
+      },
     });
+  }
+
+  cancel(): void {
+    this.router.navigate([
+      "/workspaces",
+      this.workspaceId(),
+      "projects",
+      this.projectId(),
+    ]);
   }
 }

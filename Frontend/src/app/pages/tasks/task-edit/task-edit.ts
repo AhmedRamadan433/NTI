@@ -36,12 +36,12 @@ export class TaskEdit {
   protected error = signal<string | null>(null);
 
   protected form = this.fb.nonNullable.group({
-    title: ["", [Validators.required, Validators.minLength(2)]],
+    name: ["", [Validators.required, Validators.minLength(2)]],
     description: [""],
-    status: ["todo", [Validators.required]],
+    status: ["To_Do", [Validators.required]],
     priority: ["medium", [Validators.required]],
-    dueDate: [""],
-    assignee: [""], // تم التغيير من assigneeId إلى assignee
+    endDate: [""],
+    assignedTo: this.fb.nonNullable.control<string[]>([]), // array of user ids
   });
 
   constructor() {
@@ -61,12 +61,12 @@ export class TaskEdit {
         const t = res.data;
         if (t) {
           this.form.patchValue({
-            title: t.title,
+            name: t.name,
             description: t.description ?? "",
             status: t.status,
             priority: t.priority,
-            dueDate: t.dueDate ?? "",
-            assignee: t.assignee ?? "", // تم التغيير هنا أيضاً
+            endDate: t.endDate ?? "",
+            assignedTo: t.assignedTo ?? [],
           });
         }
         this.loading.set(false);
@@ -77,6 +77,15 @@ export class TaskEdit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  protected onAssignedToChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    const ids = value
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    this.form.controls.assignedTo.setValue(ids);
   }
 
   submit(): void {

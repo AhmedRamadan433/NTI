@@ -62,10 +62,10 @@ const getAllProjects = asyncWrapper(async (req, res, next) => {
     const error = new AppError("Workspace not found", 404, HttpStatus.FAIL);
     return next(error);
   }
-  const projects = await Project.find({ workspace: workspaceId }).populate(
-    "projectOwner",
-    "username email",
-  );
+  const projects = await Project.find({ workspace: workspaceId })
+    .populate("projectOwner", "username email")
+    .populate("createdBy", "username email")
+    .populate("workspace", "name");
   if (!projects) {
     const error = new AppError(
       "Failed to retrieve projects",
@@ -80,10 +80,10 @@ const getAllProjects = asyncWrapper(async (req, res, next) => {
 ////// get project by id
 const getProjectById = asyncWrapper(async (req, res, next) => {
   const { id } = req.params;
-  const project = await Project.findById(id).populate(
-    "projectOwner",
-    "username email",
-  );
+  const project = await Project.findById(id)
+    .populate("projectOwner", "username email")
+    .populate("createdBy", "username email")
+    .populate("workspace", "name");
   if (!project) {
     const error = new AppError("Project not found", 404, HttpStatus.FAIL);
     return next(error);
