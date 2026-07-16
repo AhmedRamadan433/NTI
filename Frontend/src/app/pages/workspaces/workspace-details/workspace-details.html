@@ -1,0 +1,54 @@
+@if (loading()) {
+<div class="empty-state">Loading workspace...</div>
+} @else { @if (workspace(); as ws) {
+<div class="workspace-detail">
+  <div class="breadcrumb">
+    <a routerLink="/workspaces">Workspaces</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>{{ ws.name }}</span>
+  </div>
+
+  <div class="workspace-header">
+    <div class="workspace-header-info">
+      <div class="workspace-icon-lg">{{ ws.name.charAt(0) }}</div>
+      <div>
+        <h1 class="page-title">{{ ws.name }}</h1>
+        <p class="text-secondary text-sm">
+          {{ ws.description || 'No description' }}
+        </p>
+      </div>
+    </div>
+    <div class="page-actions">
+      <a
+        [routerLink]="['/workspaces', ws._id, 'edit']"
+        class="btn btn-secondary btn-sm"
+        >Edit</a
+      >
+      <a
+        [routerLink]="['/workspaces', ws._id, 'delete']"
+        class="btn btn-danger btn-sm"
+        >Delete</a
+      >
+    </div>
+  </div>
+
+  <nav class="workspace-tabs">
+    <a
+      [routerLink]="['/workspaces', ws._id, 'projects']"
+      routerLinkActive="active"
+      >Projects</a
+    >
+  </nav>
+
+  <div class="workspace-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+} @else {
+<div class="card empty-state">
+  <h3>Workspace not found</h3>
+  <a routerLink="/workspaces" class="btn btn-primary mt-2"
+    >Back to Workspaces</a
+  >
+</div>
+} }

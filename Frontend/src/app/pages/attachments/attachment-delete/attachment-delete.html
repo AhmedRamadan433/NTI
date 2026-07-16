@@ -1,0 +1,29 @@
+@if (loading()) {
+  <div class="empty-state">Loading...</div>
+} @else {
+  @if (attachment(); as att) {
+    <div class="page-header">
+      <h1 class="page-title">Delete Attachment</h1>
+    </div>
+
+    <div class="card danger-card">
+      <div class="danger-icon">!</div>
+      <h3>Are you sure?</h3>
+      <p>
+        Deleting <strong>{{ att.fileName }}</strong> will permanently remove this file.
+        This action cannot be undone.
+      </p>
+      <div class="form-actions">
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
+          {{ deleting() ? 'Deleting...' : 'Yes, delete it' }}
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="card empty-state">
+      <h3>Attachment not found</h3>
+      <button class="btn btn-primary mt-2" (click)="cancel()">Back to Attachments</button>
+    </div>
+  }
+}

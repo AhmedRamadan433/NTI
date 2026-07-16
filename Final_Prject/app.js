@@ -5,9 +5,13 @@ const connectDB = require("./config/dbConnect.js");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const HttpStatusText = require("./utils/HttpStatusText.js");
-const allRoutes = require("./routes/all_routes");
+const path = require("path");
+const cors = require("cors");
+app.use(cors());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 dotenv.config();
 connectDB();
+const allRoutes = require("./routes/all_routes");
 app.use(morgan("dev"));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

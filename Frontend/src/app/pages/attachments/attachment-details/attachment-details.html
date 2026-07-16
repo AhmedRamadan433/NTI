@@ -1,0 +1,49 @@
+@if (loading()) {
+<div class="empty-state">Loading attachment...</div>
+} @else { @if (attachment(); as att) {
+<div class="breadcrumb">
+  <a routerLink="/attachments">Attachments</a>
+  <span class="breadcrumb-separator">/</span>
+  <span>{{ att.originalName || att.fileName }}</span>
+</div>
+
+<div class="card">
+  <div class="detail-header">
+    <h1 class="page-title">{{ att.originalName || att.fileName }}</h1>
+    <div class="page-actions">
+      <a [routerLink]="['/attachments', att._id]" class="btn btn-danger btn-sm"
+        >Delete</a
+      >
+    </div>
+  </div>
+
+  <div class="detail-meta">
+    <div class="meta-item">
+      <span class="meta-label">File Type</span>
+      <span>{{ att.mimeType }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">File Size</span>
+      <span>{{ formatSize(att.size) }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Uploaded On</span>
+      <span>{{ att.createdAt }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-2">
+  <h3>Download</h3>
+  <a href="{{ att.fileUrl }}" class="btn btn-primary" target="_blank"
+    >Open / Download File</a
+  >
+</div>
+} @else {
+<div class="card empty-state">
+  <h3>Attachment not found</h3>
+  <a routerLink="/attachments" class="btn btn-primary mt-2"
+    >Back to Attachments</a
+  >
+</div>
+} }

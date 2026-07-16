@@ -1,0 +1,71 @@
+@if (loading()) {
+<div class="empty-state">Loading task...</div>
+} @else { @if (task(); as t) {
+<div class="breadcrumb">
+  <a routerLink="/workspaces">Workspaces</a>
+  <span class="breadcrumb-separator">/</span>
+  <a [routerLink]="['/workspaces', workspaceId()]">Workspace</a>
+  <span class="breadcrumb-separator">/</span>
+  <a [routerLink]="['/workspaces', workspaceId(), 'projects', projectId()]"
+    >Project</a
+  >
+  <span class="breadcrumb-separator">/</span>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', t._id]"
+    >{{ t.title }}</a
+  >
+</div>
+
+<div class="page-header">
+  <h1 class="page-title">{{ t.title }}</h1>
+  <div class="page-actions">
+    <a
+      [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', t._id, 'edit']"
+      class="btn btn-secondary btn-sm"
+      >Edit</a
+    >
+  </div>
+</div>
+
+<div class="card">
+  <div class="task-meta">
+    <div class="meta-item">
+      <span class="meta-label">Status</span>
+      <span class="badge" [class]="statusClass(t.status)">{{ t.status }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Priority</span>
+      <span class="badge" [class]="priorityClass(t.priority)"
+        >{{ t.priority }}</span
+      >
+    </div>
+    @if (t.dueDate) {
+    <div class="meta-item">
+      <span class="meta-label">Due Date</span>
+      <span>{{ t.dueDate }}</span>
+    </div>
+    }
+  </div>
+
+  <h3>Description</h3>
+  <p>{{ t.description || 'No description' }}</p>
+</div>
+
+@if (t.sprint) {
+<div class="card">
+  <h3>Sprint</h3>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'sprints', t.sprint]"
+    >View Sprint</a
+  >
+</div>
+} } @else {
+<div class="card empty-state">
+  <h3>Task not found</h3>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks']"
+    class="btn btn-primary mt-2"
+    >Back to Tasks</a
+  >
+</div>
+} }

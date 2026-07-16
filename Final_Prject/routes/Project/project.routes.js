@@ -5,11 +5,11 @@ const protect = require("../../middleware/auth.middleware.js");
 
 router.use(protect);
 router
-  .route("/workspace/:workspaceId/project")
+  .route("/workspace/:workspaceId/projects")
   .post(projectController.createProject)
   .get(projectController.getAllProjects);
 router
-  .route("/project/:id")
+  .route("/projects/:id")
   .get(projectController.getProjectById)
   .patch(projectController.updateProject)
   .delete(projectController.deleteProject);

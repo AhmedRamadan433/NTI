@@ -76,7 +76,8 @@ const projectSchema = new mongoose.Schema(
     },
     projectAttachments: [
       {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Attachment",
       },
     ],
   },

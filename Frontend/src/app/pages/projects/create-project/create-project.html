@@ -1,0 +1,94 @@
+<div class="page-header">
+  <h1>Create New Project</h1>
+</div>
+
+<div class="card">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <div class="form-group">
+      <label for="projectName">Project Name</label>
+      <input
+        id="projectName"
+        type="text"
+        formControlName="projectName"
+        class="form-control"
+        placeholder="e.g. Website Redesign"
+      />
+      @if (form.get('projectName')?.invalid && form.get('projectName')?.touched)
+      {
+      <small class="text-error"
+        >Project name is required (min 3 characters).</small
+      >
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="projectDescription">Description</label>
+      <textarea
+        id="projectDescription"
+        formControlName="projectDescription"
+        class="form-control"
+        rows="4"
+        placeholder="Describe the project goals..."
+      ></textarea>
+      @if (form.get('projectDescription')?.invalid &&
+      form.get('projectDescription')?.touched) {
+      <small class="text-error"
+        >Description is required (min 10 characters).</small
+      >
+      }
+    </div>
+
+    <div class="grid grid-2">
+      <div class="form-group">
+        <label for="projectStatus">Status</label>
+        <select
+          id="projectStatus"
+          formControlName="projectStatus"
+          class="form-control"
+        >
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="projectPriority">Priority</label>
+        <select
+          id="projectPriority"
+          formControlName="projectPriority"
+          class="form-control"
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="projectEndDate">End Date</label>
+      <input
+        id="projectEndDate"
+        type="date"
+        formControlName="projectEndDate"
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-actions">
+      <a
+        [routerLink]="['/workspaces', workspaceId(), 'projects']"
+        class="btn btn-secondary"
+        >Cancel</a
+      >
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        {{ loading() ? 'Creating...' : 'Create Project' }}
+      </button>
+    </div>
+  </form>
+</div>

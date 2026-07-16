@@ -6,7 +6,7 @@ const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
 const ActivityService = require("../../services/activity.service");
 const ActivityActions = require("../../utils/activityActions");
-
+const ProjectSettings = require("../../models/projectSettings.model.js");
 const getChangedFields = (previous, updated, data) => {
   const before = {};
   const after = {};
@@ -43,6 +43,7 @@ const createProject = asyncWrapper(async (req, res, next) => {
     );
     return next(error);
   }
+  await ProjectSettings.create({ project: project._id });
   await ActivityService.log({
     action: ActivityActions.PROJECT_CREATED,
     actor: req.user.id,

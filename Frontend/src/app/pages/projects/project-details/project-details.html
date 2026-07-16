@@ -1,0 +1,119 @@
+@if (loading()) {
+<div class="empty-state">Loading project...</div>
+} @else { @if (project(); as p) {
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a routerLink="/workspaces">Workspaces</a>
+  <span class="breadcrumb-separator">/</span>
+  <a [routerLink]="['/workspaces', workspaceId()]">Workspace</a>
+  <span class="breadcrumb-separator">/</span>
+  <a [routerLink]="['/workspaces', workspaceId(), 'projects']">Projects</a>
+  <span class="breadcrumb-separator">/</span>
+  <span>{{ p.projectName }}</span>
+</div>
+
+<!-- Header Section -->
+<div class="project-detail-header">
+  <div class="project-title-area">
+    <div class="flex gap-2">
+      <span
+        class="badge"
+        [class.badge-success]="p.projectStatus === 'Completed'"
+        [class.badge-info]="p.projectStatus === 'In Progress'"
+        [class.badge-neutral]="p.projectStatus === 'Not Started'"
+      >
+        {{ p.projectStatus }}
+      </span>
+      <span class="badge badge-warning">{{ p.projectPriority }}</span>
+    </div>
+    <h1 class="page-title">{{ p.projectName }}</h1>
+    <p class="text-secondary">
+      {{ p.projectDescription || 'No description provided for this project.' }}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a
+      [routerLink]="['/workspaces', workspaceId(), 'projects', p._id, 'edit']"
+      class="btn btn-secondary btn-sm"
+      >Edit Project</a
+    >
+  </div>
+</div>
+
+<!-- Project Meta Data Grid -->
+<div class="grid grid-3 mb-4">
+  <div class="card meta-card">
+    <div class="meta-icon">📅</div>
+    <div>
+      <span class="meta-label">End Date</span>
+      <p class="meta-value">{{ p.projectEndDate || 'Not set' }}</p>
+    </div>
+  </div>
+  <div class="card meta-card">
+    <div class="meta-icon">🏢</div>
+    <div>
+      <span class="meta-label">Workspace ID</span>
+      <p class="meta-value text-sm text-secondary">
+        {{ p.workspace || 'N/A' }}
+      </p>
+    </div>
+  </div>
+  <div class="card meta-card">
+    <div class="meta-icon">📁</div>
+    <div>
+      <span class="meta-label">Archived</span>
+      <p class="meta-value">{{ p.isArchived ? 'Yes' : 'No' }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Navigation Cards -->
+<h3 class="section-title">Project Management</h3>
+<div class="grid grid-2">
+  <!-- Sprints Card -->
+  <div class="card card-hover nav-card">
+    <a
+      [routerLink]="['/workspaces', workspaceId(), 'projects', p._id, 'sprints']"
+      class="nav-card-inner"
+    >
+      <div class="nav-icon sprint-icon">🏃</div>
+      <div class="nav-details">
+        <h2>Sprints</h2>
+        <p class="text-secondary text-sm">
+          Plan your work in time-boxed iterations. Manage goals, timelines, and
+          progress of your sprints here.
+        </p>
+        <span class="btn btn-secondary btn-sm mt-2">View All Sprints →</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Tasks Card -->
+  <div class="card card-hover nav-card">
+    <a
+      [routerLink]="['/workspaces', workspaceId(), 'projects', p._id, 'tasks']"
+      class="nav-card-inner"
+    >
+      <div class="nav-icon task-icon">✅</div>
+      <div class="nav-details">
+        <h2>Tasks</h2>
+        <p class="text-secondary text-sm">
+          Track bugs, features, and daily work items. Assign tasks, set
+          priorities, and monitor completion status.
+        </p>
+        <span class="btn btn-secondary btn-sm mt-2">View All Tasks →</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+} @else {
+<div class="card empty-state">
+  <h3>Project not found</h3>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects']"
+    class="btn btn-primary mt-2"
+    >Back to Projects</a
+  >
+</div>
+} }

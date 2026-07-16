@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px;
+}

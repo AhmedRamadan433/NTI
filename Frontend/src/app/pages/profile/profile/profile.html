@@ -1,0 +1,48 @@
+<div class="page-header">
+  <h1 class="page-title">Profile</h1>
+</div>
+
+@if (saved()) {
+  <div class="alert alert-success">Profile updated successfully.</div>
+}
+
+<div class="profile-layout">
+  <div class="card profile-avatar-card">
+    <div class="profile-avatar">
+      {{ form.controls.name.value.charAt(0).toUpperCase() || '?' }}
+    </div>
+    <h3>{{ form.controls.name.value || 'User' }}</h3>
+    <p class="text-secondary text-sm">{{ form.controls.email.value }}</p>
+  </div>
+
+  <div class="card form-card">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-2">
+      <div class="form-group">
+        <label class="form-label" for="name">Full name</label>
+        <input id="name" type="text" class="form-control" formControlName="name" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">Name is required (min 2 characters).</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" type="email" class="form-control" formControlName="email" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="avatarUrl">Avatar URL (optional)</label>
+        <input id="avatarUrl" type="text" class="form-control" formControlName="avatarUrl" placeholder="https://..." />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save Profile' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

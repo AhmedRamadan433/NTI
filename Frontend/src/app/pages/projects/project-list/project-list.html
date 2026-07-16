@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h2>Projects</h2>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', 'create']"
+    class="btn btn-primary btn-sm"
+  >
+    + New Project
+  </a>
+</div>
+
+@if (loading()) {
+<div class="empty-state">Loading projects...</div>
+} @else if (projects().length === 0) {
+<div class="card empty-state">
+  <h3>No projects yet</h3>
+  <p>Create a project to start organizing tasks and sprints.</p>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', 'create']"
+    class="btn btn-primary mt-2"
+  >
+    Create Project
+  </a>
+</div>
+} @else {
+<div class="grid grid-3">
+  @for (project of projects(); track project._id) {
+  <div class="card card-hover project-card">
+    <div class="project-header">
+      <span
+        class="badge"
+        [class.badge-success]="project.projectStatus === 'Completed'"
+        [class.badge-info]="project.projectStatus === 'In Progress'"
+        [class.badge-neutral]="project.projectStatus === 'Not Started'"
+      >
+        {{ project.projectStatus }}
+      </span>
+      <span class="badge badge-warning">{{ project.projectPriority }}</span>
+    </div>
+    <h3>
+      <a [routerLink]="['/workspaces', workspaceId(), 'projects', project._id]"
+        >{{ project.projectName }}</a
+      >
+    </h3>
+    <p class="text-secondary text-sm project-desc">
+      {{ project.projectDescription || 'No description' }}
+    </p>
+    <div class="project-footer">
+      <a
+        [routerLink]="['/workspaces', workspaceId(), 'projects', project._id]"
+        class="btn btn-secondary btn-sm"
+        >View Details</a
+      >
+      <a
+        [routerLink]="['/workspaces', workspaceId(), 'projects', project._id, 'edit']"
+        class="btn btn-ghost btn-sm"
+        >Edit</a
+      >
+    </div>
+  </div>
+  }
+</div>
+}

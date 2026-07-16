@@ -1,0 +1,39 @@
+@if (loading()) {
+  <div class="empty-state">Loading...</div>
+} @else {
+  @if (task(); as t) {
+    <div class="breadcrumb">
+      <a [routerLink]="['/workspaces', workspaceId]">Workspace</a>
+      <span class="breadcrumb-separator">/</span>
+      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId]">Project</a>
+      <span class="breadcrumb-separator">/</span>
+      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'tasks']">Tasks</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Delete</span>
+    </div>
+
+    <div class="page-header">
+      <h1 class="page-title">Delete Task</h1>
+    </div>
+
+    <div class="card danger-card">
+      <div class="danger-icon">!</div>
+      <h3>Are you sure?</h3>
+      <p>
+        Deleting <strong>{{ t.title }}</strong> will permanently remove this task.
+        This action cannot be undone.
+      </p>
+      <div class="form-actions">
+        <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'tasks', t.id]" class="btn btn-secondary">Cancel</a>
+        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
+          {{ deleting() ? 'Deleting...' : 'Yes, delete it' }}
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="card empty-state">
+      <h3>Task not found</h3>
+      <a [routerLink]="['/workspaces', workspaceId, 'projects', projectId, 'tasks']" class="btn btn-primary mt-2">Back to Tasks</a>
+    </div>
+  }
+}

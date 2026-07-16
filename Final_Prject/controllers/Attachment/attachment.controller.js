@@ -10,6 +10,7 @@ const AppError = require("../../utils/AppError.js");
 const HttpStatus = require("../../utils/HttpStatusText.js");
 const ActivityService = require("../../services/activity.service");
 const ActivityActions = require("../../utils/activityActions");
+const deleteUploadedFile = require("../../utils/delete_uploaded_file.js");
 
 const getAttachmentActivityScope = async (attachment) => {
   if (attachment.workspace) {
@@ -62,7 +63,9 @@ const getAttachmentActivityScope = async (attachment) => {
       return { workspace: message.workspace, project: message.project || null };
     }
     if (message?.project) {
-      const project = await Project.findById(message.project).select("workspace");
+      const project = await Project.findById(message.project).select(
+        "workspace",
+      );
       return { workspace: project?.workspace, project: message.project };
     }
   }
@@ -184,6 +187,8 @@ const updateAttachmentById = asyncWrapper(async (req, res, next) => {
     }
   }
 
+  const oldFileName = existingAttachment.fileName;
+
   const updatePayload = { ...data };
   if (req.file) {
     updatePayload.fileName = req.file.filename;
@@ -198,6 +203,11 @@ const updateAttachmentById = asyncWrapper(async (req, res, next) => {
     returnDocument: "after",
   }).populate("uploadedBy", "firstName lastName username email");
 
+  // update succeeded, safe to delete the old file now
+  if (req.file && oldFileName) {
+    await deleteUploadedFile(oldFileName, "");
+  }
+
   res.status(200).json({ status: HttpStatus.SUCCESS, data: attachment });
 });
 
@@ -207,6 +217,11 @@ const deleteAttachmentById = asyncWrapper(async (req, res, next) => {
   const attachment = await Attachment.findByIdAndDelete(id);
   if (!attachment) {
     return next(new AppError("Attachment not found", 404, HttpStatus.FAIL));
+  }
+
+  // remove the physical file from disk along with the DB record
+  if (attachment.fileName) {
+    await deleteUploadedFile(attachment.fileName, "");
   }
 
   const scope = await getAttachmentActivityScope(attachment);

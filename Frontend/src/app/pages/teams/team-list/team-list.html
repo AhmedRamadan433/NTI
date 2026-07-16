@@ -1,0 +1,18 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Teams</h1>
+    <p class="text-secondary text-sm">Manage your teams and members</p>
+  </div>
+  <a routerLink="/workspaces" class="btn btn-primary">+ New Team</a>
+</div>
+
+<div class="grid grid-3">
+  @for (team of teams; track team.id) {
+    <div class="card card-hover team-card">
+      <div class="team-icon">{{ team.name.charAt(0) }}</div>
+      <h3>{{ team.name }}</h3>
+      <p class="text-secondary text-sm">{{ team.memberCount }} members</p>
+      <a routerLink="/workspaces" class="btn btn-secondary btn-sm mt-2">View Members</a>
+    </div>
+  }
+</div>

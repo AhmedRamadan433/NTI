@@ -1,0 +1,49 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Workspaces</h1>
+    <p class="text-secondary text-sm">
+      Manage your workspaces and their projects
+    </p>
+  </div>
+  <div class="page-actions">
+    <a routerLink="/workspaces/create" class="btn btn-primary"
+      >+ New Workspace</a
+    >
+  </div>
+</div>
+
+@if (loading()) {
+<div class="empty-state">Loading workspaces...</div>
+} @else if (workspaces().length === 0) {
+<div class="card empty-state">
+  <h3>No workspaces yet</h3>
+  <p>Create your first workspace to start managing projects.</p>
+  <a routerLink="/workspaces/create" class="btn btn-primary mt-2"
+    >Create Workspace</a
+  >
+</div>
+} @else {
+<div class="grid grid-3">
+  @for (ws of workspaces(); track ws._id) {
+  <div class="card card-hover workspace-card">
+    <div class="workspace-icon">{{ ws.name.charAt(0) }}</div>
+    <h3>
+      <a [routerLink]="['/workspaces', ws._id]">{{ ws.name }}</a>
+    </h3>
+    <p class="text-secondary text-sm">
+      {{ ws.description || 'No description' }}
+    </p>
+    <div class="workspace-footer">
+      <a [routerLink]="['/workspaces', ws._id]" class="btn btn-secondary btn-sm"
+        >View Projects</a
+      >
+      <a
+        [routerLink]="['/workspaces', ws._id, 'edit']"
+        class="btn btn-ghost btn-sm"
+        >Edit</a
+      >
+    </div>
+  </div>
+  }
+</div>
+}

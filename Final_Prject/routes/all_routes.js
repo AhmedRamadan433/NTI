@@ -21,6 +21,7 @@ const teamMemberRoutes = require("./Team/team.member.routes.js");
 const taskWorkflowRoutes = require("./Task/task.workflow.routes.js");
 const activityRoutes = require("./activity.route.js");
 const searchRoutes = require("./Search/search.route.js");
+const settingsRoutes = require("./Settings/settings.routes.js");
 
 ///// user routes first to log in to get token and then access other routes
 router.use("/users", UserRoutes);
@@ -44,4 +45,5 @@ router.use("/", taskWorkflowRoutes);
 router.use("/", ProjectWorkflowRoutes);
 router.use("/", activityRoutes);
 router.use("/", searchRoutes);
+router.use("/settings", settingsRoutes);
 module.exports = router;

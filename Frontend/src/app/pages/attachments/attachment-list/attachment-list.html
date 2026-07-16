@@ -1,0 +1,58 @@
+<div class="page-header">
+  <h2>Attachments</h2>
+  <a routerLink="/attachments/upload" class="btn btn-primary btn-sm"
+    >+ Upload File</a
+  >
+</div>
+
+@if (loading()) {
+<div class="empty-state">Loading attachments...</div>
+} @else if (attachments().length === 0) {
+<div class="card empty-state">
+  <h3>No attachments yet</h3>
+  <p>Upload a file to attach it to tasks or projects.</p>
+  <a routerLink="/attachments/upload" class="btn btn-primary mt-2"
+    >Upload File</a
+  >
+</div>
+} @else {
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>File Name</th>
+        <th>Type</th>
+        <th>Size</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (att of attachments(); track att._id) {
+      <tr>
+        <td>
+          <a [routerLink]="['/attachments', att._id]"
+            >{{ att.originalName || att.fileName }}</a
+          >
+        </td>
+        <td>{{ att.mimeType }}</td>
+        <td>{{ att.size }}</td>
+        <td>
+          <div class="flex gap-1">
+            <a
+              [routerLink]="['/attachments', att._id]"
+              class="btn btn-secondary btn-sm"
+              >View</a
+            >
+            <a
+              [routerLink]="['/attachments', att._id]"
+              class="btn btn-danger btn-sm"
+              >Delete</a
+            >
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+}

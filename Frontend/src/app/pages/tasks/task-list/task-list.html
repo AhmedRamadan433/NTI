@@ -1,0 +1,85 @@
+<div class="breadcrumb">
+  <a [routerLink]="['/workspaces', workspaceId()]">Workspace</a>
+  <span class="breadcrumb-separator">/</span>
+  <a [routerLink]="['/workspaces', workspaceId(), 'projects', projectId()]"
+    >Project</a
+  >
+  <span class="breadcrumb-separator">/</span>
+  <span>Tasks</span>
+</div>
+
+<div class="page-header">
+  <h2>Tasks</h2>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', 'create']"
+    class="btn btn-primary btn-sm"
+  >
+    + New Task
+  </a>
+</div>
+
+@if (loading()) {
+<div class="empty-state">Loading tasks...</div>
+} @else if (tasks().length === 0) {
+<div class="card empty-state">
+  <h3>No tasks yet</h3>
+  <p>Create a task to start tracking work.</p>
+  <a
+    [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', 'create']"
+    class="btn btn-primary mt-2"
+  >
+    Create Task
+  </a>
+</div>
+} @else {
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (task of tasks(); track task._id) {
+      <tr>
+        <td>
+          <a
+            [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', task._id]"
+            >{{ task.title }}</a
+          >
+        </td>
+        <td>
+          <span class="badge" [class]="statusClass(task.status)"
+            >{{ task.status }}</span
+          >
+        </td>
+        <td>
+          <span class="badge" [class]="priorityClass(task.priority)"
+            >{{ task.priority }}</span
+          >
+        </td>
+        <td>{{ task.dueDate || '—' }}</td>
+        <td>
+          <div class="flex gap-1">
+            <a
+              [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', task._id]"
+              class="btn btn-secondary btn-sm"
+              >View</a
+            >
+            <a
+              [routerLink]="['/workspaces', workspaceId(), 'projects', projectId(), 'tasks', task._id, 'edit']"
+              class="btn btn-ghost btn-sm"
+              >Edit</a
+            >
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+}
